@@ -1,8 +1,12 @@
 breed [neurons neuron]
 breed [beta-amyloids beta-amyloid]
+directed-link-breed [input-links input-link]
+directed-link-breed [output-links output-link]
 
 to setup
+  create-neurons num_neurons [
 
+  ]
 end
 
 to go
@@ -35,6 +39,21 @@ GRAPHICS-WINDOW
 1
 ticks
 30.0
+
+SLIDER
+32
+16
+204
+49
+num_neurons
+num_neurons
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
