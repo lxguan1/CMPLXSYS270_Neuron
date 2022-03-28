@@ -3,8 +3,14 @@ breed [beta-amyloids beta-amyloid]
 directed-link-breed [input-links input-link]
 directed-link-breed [output-links output-link]
 
+;neurons-own
+
 to setup
   create-neurons num_neurons [
+
+  ]
+
+  create-beta-amyloids num_amyloids [
 
   ]
 end
@@ -47,6 +53,21 @@ SLIDER
 49
 num_neurons
 num_neurons
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+31
+53
+203
+86
+num_amyloids
+num_amyloids
 0
 100
 50.0
