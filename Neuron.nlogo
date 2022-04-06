@@ -3,19 +3,76 @@ breed [beta-amyloids beta-amyloid]
 directed-link-breed [input-links input-link]
 directed-link-breed [output-links output-link]
 
-;neurons-own
+neurons-own [
+  activation-threshold
+  neuron-fired
+  sum-input-vals
+  myelin-degen
+]
+
+beta-amyloids-own [attached]
 
 to setup
   create-neurons num_neurons [
-
+    set activation-threshold 55
+    set neuron-fired false
+    set sum-input-vals 0
+    set myelin-degen false
+    setxy random-xcor random-ycor
+    set color blue
   ]
 
   create-beta-amyloids num_amyloids [
-
+    set attached false
+    set size 1
+    set color green
+    setxy random-xcor random-ycor
   ]
-end
+
+  ask neurons [
+    ask other neurons [
+      if random 100 < ( (count neighbors with [member? self [other neighbors] of myself]) ^ 3.17 * (distance myself) ^ 2.63) * 100
+      [
+        if nobody != link-with myself [
+          create-input-link-from myself
+      ]
+      ]
+    ]
+  ]
+
+  ask one-of neurons [
+    set color red
+  ]
+
+  end
 
 to go
+  ask neurons with [neuron-fired = false] [
+
+    if sum-input-vals = activation-threshold [
+      set color red
+    ]
+  ]
+
+  ask beta-amyloids with [attached = false] [
+    set heading random 360
+    forward 1
+    let closest min-one-of neurons [distance myself]
+    if [distance closest] of myself < 1 [
+      ask closest [set activation-threshold 1000]
+      set attached true
+    ]
+  ]
+
+  ask neurons with [color = red] [
+    set color blue
+    set neuron-fired true
+    if sum-input-vals > activation-threshold [
+      ask out-input-link-neighbors [
+        set sum-input-vals sum-input-vals + 25
+      ]
+    ]
+  ]
 
 end
 @#$#@#$#@
