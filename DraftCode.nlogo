@@ -7,6 +7,7 @@ directed-link-breed [dlinks dlink]
 neurons-own []
 amyloids-own [
   is-bound
+  num-ticks
 ]
 dlinks-own [
   resistance
@@ -30,6 +31,8 @@ to setup
     set color yellow
     set size .75
     set shape "pentagon"
+    set is-bound false
+    set num-ticks random 3
     setxy random-xcor random-ycor
   ]
 
@@ -39,6 +42,7 @@ to setup
     ;; set some amyloids to already be bound to some links based on how many years it has been
     ;; increase the link's resistance to transmission accordingly
     ask n-of year amyloids [
+      ;;Move the amyloid to the middle of a dlink
       let amyloid_link one-of dlinks
       let x-cor [mean [xcor] of both-ends] of amyloid_link
       let y-cor [mean [ycor] of both-ends] of amyloid_link
@@ -46,7 +50,9 @@ to setup
       ask amyloid_link [
         set resistance resistance + 1 ;1 is placeholder
         set color 128
+
       ]
+      set is-bound true
     ]
   ]
 
@@ -57,9 +63,73 @@ to go
   ;; Move beta amyloid randomly, (VERY SLOWLY, ONLY HAVE IT MOVE ONCE EVERY FEW TIMESTEPS) it has a very low probability of binding to each neuron it encounters
   ;; If a beta amyloid binds to a neuron, resistance to transmission begins to increase (AKA probability of firing begins to decrease)
   ;; For every additional beta amyloid that binds to the neuron, the rate of probability-decrease increases
+  ask amyloids with [not is-bound] [
+    if num-ticks mod 3 = 0 [ ;3 timesteps per move
+      set heading random 360
+      fd 1
+      detect-amyloid-collision self
+    ]
+    set num-ticks num-ticks + 1
+  ]
 
 
   ;; Mechanisms for signal propogation
+end
+
+to detect-amyloid-collision [amyloid-input]
+  ask dlinks [
+    ;;Get the distance between the amyloid and a link using code which
+    ;;is adapted from https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+    let x [xcor] of amyloid-input
+    let y [ycor] of amyloid-input
+    let x1 [xcor] of end1
+    let y1 [ycor] of end1
+    let x2 [xcor] of end2
+    let y2 [ycor] of end2
+
+    let A x - x1
+    let B y - y1
+    let C x2 - x1
+    let D y2 - y1
+
+    let dot A * C + B * D;
+    let len_sq C * C + D * D;
+    let param -1;
+    if (len_sq != 0) [ ;in case of 0 length line
+      set param dot / len_sq
+    ]
+
+    let xx 0
+    let yy 0
+
+    ifelse (param < 0) [
+      set xx x1
+      set yy y1
+    ]
+    [ifelse (param > 1) [
+      set xx x2
+      set yy y2
+      ]
+      [
+        set xx x1 + param * C
+        set yy y1 + param * D
+      ]
+    ]
+
+    let dx_ x - xx
+    let dy_ y - yy
+    let height sqrt(dx_ * dx_ + dy_ * dy_)
+
+    ;;If the amyloid is close enough, bind the amyloid to the link
+    if height < 1 and [not is-bound] of amyloid-input [
+      set resistance resistance + 1 ;1 is placeholder
+      set color 128
+      ask amyloid-input [
+        show height
+        set is-bound true
+      ]
+    ]
+  ]
 end
 
 to fire
@@ -125,7 +195,7 @@ year
 year
 -1
 30
-25.0
+3.0
 1
 1
 NIL
@@ -140,7 +210,7 @@ num_neurons
 num_neurons
 0
 100
-11.0
+9.0
 1
 1
 NIL
@@ -170,11 +240,28 @@ rewire_prob
 rewire_prob
 0
 1
-1.0
+0.0
 0.1
 1
 NIL
 HORIZONTAL
+
+BUTTON
+107
+22
+170
+55
+NIL
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
