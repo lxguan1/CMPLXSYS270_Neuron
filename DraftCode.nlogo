@@ -31,7 +31,7 @@ to setup
   ]
 
   ;; Set number of amyloids based on how many years in we are
-  let num-amyloids year * 3 ;; 3 is a placeholder
+  let num-amyloids year * 5 ;; 3 is a placeholder
   create-amyloids num-amyloids [
     set color yellow
     set size .75
@@ -57,7 +57,7 @@ to setup
       let y-cor [mean [ycor] of both-ends] of amyloid_link
       setxy x-cor y-cor
       ask amyloid_link [
-        set resistance resistance * 1.2 ;1 is placeholder
+        set resistance resistance * (1.2 ^ year) ;1 is placeholder
         set num-connected 1
         set color 128
 
@@ -255,7 +255,7 @@ year
 year
 -1
 30
-20.0
+30.0
 1
 1
 NIL
