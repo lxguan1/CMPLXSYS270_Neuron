@@ -255,7 +255,7 @@ year
 year
 -1
 30
-30.0
+6.0
 1
 1
 NIL
@@ -268,7 +268,7 @@ SLIDER
 169
 num_neurons
 num_neurons
-0
+11
 100
 12.0
 1
@@ -283,7 +283,7 @@ SLIDER
 207
 num_links_between
 num_links_between
-0
+3
 100
 5.0
 1
@@ -300,7 +300,7 @@ rewire_prob
 rewire_prob
 0
 1
-1.0
+0.9
 0.1
 1
 NIL
