@@ -193,7 +193,6 @@ to measure-global-efficiency
 
 
 
-
     ]
     set local-efficiency (1 / (local-connected)) * temp-val
     set global-efficiency-sum global-efficiency-sum + local-efficiency
