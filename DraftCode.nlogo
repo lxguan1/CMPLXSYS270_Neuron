@@ -182,21 +182,23 @@ to measure-global-efficiency
   ;; measures the global efficiency of the system, based on the equation from https://www.nature.com/articles/s41598-019-43076-y#Sec7
   let global-efficiency-sum 0
   ask neurons [
-    let local-efficiency 1 / (num_neurons - 1)
+    let local-efficiency 1
     let temp-val 0
+    let local-connected 0
     ask neurons with [self != myself] [
 
-      carefully [
+
+        set local-connected local-connected + 1
         set temp-val temp-val + (1 / nw:weighted-distance-to myself resistance)
-      ]
-      [
-        set temp-val temp-val + (1 / mean [resistance] of dlinks)
-      ]
+
+
+
 
     ]
-    set local-efficiency local-efficiency * temp-val
+    set local-efficiency (1 / (local-connected)) * temp-val
     set global-efficiency-sum global-efficiency-sum + local-efficiency
   ]
+
   set global-efficiency global-efficiency-sum * (1 / num_neurons)
 
 end
@@ -254,7 +256,7 @@ year
 year
 -1
 30
-10.0
+20.0
 1
 1
 NIL
@@ -269,7 +271,7 @@ num_neurons
 num_neurons
 0
 100
-9.0
+12.0
 1
 1
 NIL
@@ -284,7 +286,7 @@ num_links_between
 num_links_between
 0
 100
-2.0
+5.0
 1
 1
 NIL
