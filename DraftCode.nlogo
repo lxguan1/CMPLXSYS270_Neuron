@@ -11,6 +11,11 @@ amyloids-own [
 ]
 dlinks-own [
   resistance
+  num-connected
+]
+
+globals [
+  global-efficiency
 ]
 
 to setup
@@ -36,7 +41,11 @@ to setup
     setxy random-xcor random-ycor
   ]
 
-
+  ;Initialize directed links
+  ask dlinks [
+    set resistance 1
+    set num-connected 0
+  ]
 
   if year > 0 [
     ;; set some amyloids to already be bound to some links based on how many years it has been
@@ -48,7 +57,8 @@ to setup
       let y-cor [mean [ycor] of both-ends] of amyloid_link
       setxy x-cor y-cor
       ask amyloid_link [
-        set resistance resistance + 1 ;1 is placeholder
+        set resistance resistance * 1.2 ;1 is placeholder
+        set num-connected 1
         set color 128
 
       ]
@@ -67,13 +77,23 @@ to go
     if num-ticks mod 3 = 0 [ ;3 timesteps per move
       set heading random 360
       fd 1
+
       detect-amyloid-collision self
     ]
     set num-ticks num-ticks + 1
   ]
 
+  ;Make links with amyloids continue to increase resistance
+  ask dlinks with [resistance > 1 and resistance < 512] [
+    ;show resistance
+    set resistance resistance * 1.2
+
+  ]
 
   ;; Mechanisms for signal propogation
+  propagate-signal
+  measure-global-efficiency
+  tick
 end
 
 to detect-amyloid-collision [amyloid-input]
@@ -121,25 +141,64 @@ to detect-amyloid-collision [amyloid-input]
     let height sqrt(dx_ * dx_ + dy_ * dy_)
 
     ;;If the amyloid is close enough, bind the amyloid to the link
-    if height < 1 and [not is-bound] of amyloid-input [
-      set resistance resistance + 1 ;1 is placeholder
+    if height < 1 and [not is-bound] of amyloid-input and random 100 < prob-bind [
+      set resistance resistance * 1.2 ;1 is placeholder
       set color 128
       ask amyloid-input [
-        show height
+        ;show height
         set is-bound true
       ]
     ]
   ]
 end
 
+to propagate-signal
+
+  ;; Red == currently firing neuron
+  ask neurons with [color = red] [
+    ask my-out-links [
+
+      ;; If the neuron is red, the next neurons turn red with a certain probability based on the value of the link's resistance
+      if (random-float 1 < (1 / resistance)) [
+        ask end2 [
+          set color red
+        ]
+      ]
+    ]
+
+    set color blue
+  ]
+end
+
 to fire
   ;; fire off a random neuron
-  measure-global-efficiency
+  ask one-of neurons [
+    set color red
+  ]
 
 end
 
 to measure-global-efficiency
   ;; measures the global efficiency of the system, based on the equation from https://www.nature.com/articles/s41598-019-43076-y#Sec7
+  let global-efficiency-sum 0
+  ask neurons [
+    let local-efficiency 1 / (num_neurons - 1)
+    let temp-val 0
+    ask neurons with [self != myself] [
+
+      carefully [
+        set temp-val temp-val + (1 / nw:weighted-distance-to myself resistance)
+      ]
+      [
+        set temp-val temp-val + (1 / mean [resistance] of dlinks)
+      ]
+
+    ]
+    set local-efficiency local-efficiency * temp-val
+    set global-efficiency-sum global-efficiency-sum + local-efficiency
+  ]
+  set global-efficiency global-efficiency-sum * (1 / num_neurons)
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -195,7 +254,7 @@ year
 year
 -1
 30
-3.0
+10.0
 1
 1
 NIL
@@ -240,7 +299,7 @@ rewire_prob
 rewire_prob
 0
 1
-0.0
+1.0
 0.1
 1
 NIL
@@ -254,6 +313,67 @@ BUTTON
 NIL
 go
 T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+24
+254
+196
+287
+prob-bind
+prob-bind
+0
+100
+0.1
+0.1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+22
+296
+125
+341
+NIL
+global-efficiency
+17
+1
+11
+
+PLOT
+21
+361
+221
+511
+plot 1
+NIL
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot global-efficiency"
+
+BUTTON
+64
+58
+127
+91
+NIL
+fire\n
+NIL
 1
 T
 OBSERVER
