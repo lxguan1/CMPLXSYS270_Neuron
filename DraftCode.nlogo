@@ -46,6 +46,8 @@ to setup
     set resistance 1
   ]
 
+  set num-fired 0
+
   if year > 0 [
     ;; set some amyloids to already be bound to some links based on how many years it has been
     ;; increase the link's resistance to transmission accordingly
@@ -254,7 +256,7 @@ year
 year
 -1
 30
-18.0
+29.0
 1
 1
 NIL
@@ -397,6 +399,17 @@ num-amyloids-multiplier
 1
 NIL
 HORIZONTAL
+
+MONITOR
+130
+302
+196
+347
+NIL
+num-fired
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -750,6 +763,26 @@ NetLogo 6.1.1
     <go>go</go>
     <timeLimit steps="1000"/>
     <metric>global-efficiency</metric>
+    <enumeratedValueSet variable="rewire_prob">
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="year" first="0" step="1" last="30"/>
+    <enumeratedValueSet variable="prob-bind">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="num_neurons">
+      <value value="12"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="num_links_between">
+      <value value="5"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="experiment-numfired" repetitions="5" runMetricsEveryStep="false">
+    <setup>setup
+fire</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <metric>num-fired</metric>
     <enumeratedValueSet variable="rewire_prob">
       <value value="0.9"/>
     </enumeratedValueSet>
