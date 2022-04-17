@@ -256,7 +256,7 @@ year
 year
 -1
 30
-29.0
+21.0
 1
 1
 NIL
@@ -351,10 +351,10 @@ global-efficiency
 11
 
 PLOT
-21
-361
-221
-511
+9
+359
+209
+509
 plot 1
 NIL
 NIL
