@@ -11,11 +11,11 @@ amyloids-own [
 ]
 dlinks-own [
   resistance
-  num-connected
 ]
 
 globals [
   global-efficiency
+  num-fired
 ]
 
 to setup
@@ -31,7 +31,7 @@ to setup
   ]
 
   ;; Set number of amyloids based on how many years in we are
-  let num-amyloids year * 5 ;; 3 is a placeholder
+  let num-amyloids year * num-amyloids-multiplier
   create-amyloids num-amyloids [
     set color yellow
     set size .75
@@ -44,7 +44,6 @@ to setup
   ;Initialize directed links
   ask dlinks [
     set resistance 1
-    set num-connected 0
   ]
 
   if year > 0 [
@@ -57,8 +56,7 @@ to setup
       let y-cor [mean [ycor] of both-ends] of amyloid_link
       setxy x-cor y-cor
       ask amyloid_link [
-        set resistance resistance * (1.2 ^ year) ;1 is placeholder
-        set num-connected 1
+        set resistance resistance * (1.2 ^ year)
         set color 128
 
       ]
@@ -156,6 +154,7 @@ to propagate-signal
 
   ;; Red == currently firing neuron
   ask neurons with [color = red] [
+    set num-fired num-fired + 1
     ask my-out-links [
 
       ;; If the neuron is red, the next neurons turn red with a certain probability based on the value of the link's resistance
@@ -255,7 +254,7 @@ year
 year
 -1
 30
-6.0
+18.0
 1
 1
 NIL
@@ -383,6 +382,21 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+26
+528
+204
+561
+num-amyloids-multiplier
+num-amyloids-multiplier
+3
+10
+10.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -730,6 +744,27 @@ NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="5" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <metric>global-efficiency</metric>
+    <enumeratedValueSet variable="rewire_prob">
+      <value value="0.9"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="year" first="0" step="1" last="30"/>
+    <enumeratedValueSet variable="prob-bind">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="num_neurons">
+      <value value="12"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="num_links_between">
+      <value value="5"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
